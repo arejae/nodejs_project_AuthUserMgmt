@@ -8,40 +8,71 @@ let friends = {
     "peterjones@gamil.com":{"firstName": "Peter","lastName": "Jones","DOB":"21-03-1989"}
 };
 
+//testing with registor, login , get , post, put,  delete api.
+//register post api http://localhost:5000/register body {"username":"user2", "password":"password2"}
+//login post api http://localhost:5000/register body {"username":"user2", "password":"password2"}
+//get all api http://localhost:5000/friends
+//get with email api http://localhost:5000/friends/johnsmith@gamil.com
+//put/update with email api http://localhost:5000/friends/johnsmith@gamil.com  and json body {"DOB":"22-12-1991"}
+//delete with email api http://localhost:5000/friends/johnsmith@gamil.com
 
 // GET request: Retrieve all friends
-router.get("/",(req,res)=>{
-
-  // Update the code here
-
-  res.send("Yet to be implemented")//This line is to be replaced with actual return value
+router.get("/", (req, res) => {
+    res.send(JSON.stringify(friends, null, 4));
 });
 
 // GET by specific ID request: Retrieve a single friend with email ID
-router.get("/:email",(req,res)=>{
-  // Update the code here
-  res.send("Yet to be implemented")//This line is to be replaced with actual return value
+router.get("/:email",(req, res) => {
+    const getUserByEmail = req.params.email
+    res.send(friends[getUserByEmail]);
 });
-
 
 // POST request: Add a new friend
-router.post("/",(req,res)=>{
-  // Update the code here
-  res.send("Yet to be implemented")//This line is to be replaced with actual return value
+router.post("/", (req, res) => {
+    if (req.body.email) {
+        friends[req.body.email] = {
+            "firstName": req.body.firstName,
+            "lastName": req.body.lastName,
+            "DOB": req.body.DOB
+        }
+    }
+    res.send(`The user: ${req.body.firstName} has been added`);
 });
-
 
 // PUT request: Update the details of a friend with email id
-router.put("/:email", (req, res) => {
-  // Update the code here
-  res.send("Yet to be implemented")//This line is to be replaced with actual return value
-});
+router.put("/:email", function (req, res) {
+    const email = req.params.email;
+    let friend = friends[email];
 
+    if (friend) {
+        let DOB = req.body.DOB;
+        let firstName = req.body.firstName;
+        let lastName = req.body.lastName;
+
+        //if DOB the DOB has been changed, update the DOB 
+        if(DOB) {
+            friend["DOB"] = DOB;
+        }
+        if(firstName) {
+            friend["firstName"] = firstName;
+        }
+        if(lastName) {
+            friend["lastName"] = lastName;
+        }
+        friends[email] = friend;
+        res.send(`Friend with the email: ${email}, updated to: ${JSON.stringify(friend)}`);
+    } else {
+        res.send("Unable to find friend!");
+    }
+});
 
 // DELETE request: Delete a friend by email id
 router.delete("/:email", (req, res) => {
-  // Update the code here
-  res.send("Yet to be implemented")//This line is to be replaced with actual return value
+    const email = req.body.email;
+    if (email){
+        delete friends[email]
+    }
+    res.send(`Friend with the email ${email} deleted.`);
 });
 
-module.exports=router;
+module.exports = router;
